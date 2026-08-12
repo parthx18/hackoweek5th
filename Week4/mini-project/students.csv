@@ -1,0 +1,16 @@
+id,name,course,year,math,science,english,history,computer,attendance
+1,Alice,Computer Science,3,92,88,95,78,97,92
+2,Bob,Information Technology,2,65,72,58,80,70,75
+3,Charlie,Computer Science,3,98,95,91,93,99,98
+4,Diana,Electronics,2,45,50,55,48,52,60
+5,Eve,Computer Science,3,80,83,77,85,88,89
+6,Frank,Information Technology,3,70,68,74,65,72,80
+7,Grace,Electronics,2,88,91,84,79,86,95
+8,Henry,Computer Science,2,55,60,62,58,65,70
+9,Iris,Information Technology,3,93,90,88,87,95,97
+10,Jack,Electronics,3,76,80,71,82,78,85
+11,Karen,Computer Science,2,62,58,70,65,60,72
+12,Leo,Information Technology,2,85,88,80,83,90,91
+13,Mia,Electronics,3,97,94,92,96,98,99
+14,Noah,Computer Science,3,48,52,55,50,58,65
+15,Olivia,Information Technology,2,78,75,82,80,85,88
