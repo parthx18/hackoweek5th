@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classification Lab — Week 8 Interactive Studio</title>
+  <meta name="description" content="Interactive 2D visualizer for Logistic Regression and K-Nearest Neighbors (KNN) with live decision boundary mesh and confusion matrix.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="studio-header">
+      <div class="brand">
+        <span class="badge">Week 8</span>
+        <h1>Classification Lab</h1>
+        <span class="subtitle">Logistic Regression • K-Nearest Neighbors (KNN) • Decision Surfaces</span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-reset" class="btn btn-secondary">↺ Reset</button>
+        <button id="btn-sample-data" class="btn btn-primary">🎲 Generate Preset</button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="studio-workspace">
+      <!-- Left Sidebar: Controls -->
+      <aside class="controls-panel card">
+        <div class="panel-section">
+          <h3>Classifier Model</h3>
+          <div class="model-selector">
+            <button class="model-tab active" data-model="logistic">Logistic Regression</button>
+            <button class="model-tab" data-model="knn">K-Nearest Neighbors</button>
+          </div>
+        </div>
+
+        <!-- Hyperparameters -->
+        <div class="panel-section">
+          <h3>Hyperparameters</h3>
+
+          <!-- Logistic Regression: Threshold -->
+          <div class="control-group" id="threshold-group">
+            <div class="control-header">
+              <label for="threshold-slider">Decision Threshold (τ)</label>
+              <span id="threshold-val" class="param-badge">0.50</span>
+            </div>
+            <input type="range" id="threshold-slider" min="0.05" max="0.95" step="0.05" value="0.50">
+            <div class="slider-marks">
+              <span>0.05 (High Recall)</span>
+              <span>0.50 (Default)</span>
+              <span>0.95 (High Prec)</span>
+            </div>
+          </div>
+
+          <!-- KNN: K slider -->
+          <div class="control-group" id="k-group" style="display: none;">
+            <div class="control-header">
+              <label for="k-slider">Neighborhood Size (k)</label>
+              <span id="k-val" class="param-badge">5</span>
+            </div>
+            <input type="range" id="k-slider" min="1" max="25" step="2" value="5">
+            <div class="slider-marks">
+              <span>k = 1 (Overfit)</span>
+              <span>k = 5</span>
+              <span>k = 15</span>
+              <span>k = 25 (Smooth)</span>
+            </div>
+          </div>
+
+          <!-- KNN: Distance Metric -->
+          <div class="control-group" id="metric-group" style="display: none;">
+            <label for="distance-metric">Distance Metric</label>
+            <select id="distance-metric" class="dropdown">
+              <option value="euclidean">Euclidean (L2 Norm)</option>
+              <option value="manhattan">Manhattan (L1 Norm)</option>
+            </select>
+          </div>
+
+          <!-- Presets -->
+          <div class="control-group">
+            <label for="preset-select">Synthetic Distribution</label>
+            <select id="preset-select" class="dropdown">
+              <option value="blobs">Linearly Separable Blobs</option>
+              <option value="moons">Interlocking Moons</option>
+              <option value="circles">Concentric Circles</option>
+              <option value="xor">XOR Non-Linear Clusters</option>
+              <option value="empty">Empty Canvas (Click to Place)</option>
+            </select>
+          </div>
+
+          <!-- Point Placement Class Mode -->
+          <div class="control-group">
+            <label>Click Canvas to Add Point As:</label>
+            <div class="class-picker">
+              <label class="class-option class-0-option">
+                <input type="radio" name="active-class" value="0" checked>
+                <span class="dot-class-0"></span> Class 0 (Red)
+              </label>
+              <label class="class-option class-1-option">
+                <input type="radio" name="active-class" value="1">
+                <span class="dot-class-1"></span> Class 1 (Blue)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Formula Card -->
+        <div class="panel-section formula-card">
+          <div class="formula-title">Activation / Decision Rule</div>
+          <div id="math-formula" class="formula-body">
+            $$\sigma(z) = \frac{1}{1 + e^{-(\mathbf{w}^T \mathbf{x} + b)}}$$
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center: Canvas Workspace -->
+      <section class="canvas-section card">
+        <div class="canvas-toolbar">
+          <div class="canvas-status">
+            <span class="status-dot"></span>
+            <span id="point-count">50 Points</span>
+            <span class="hint-text">• Click canvas to drop selected class points!</span>
+          </div>
+          <div class="canvas-actions">
+            <button id="btn-clear" class="btn-icon" title="Clear Canvas">🗑️ Clear</button>
+          </div>
+        </div>
+
+        <div class="canvas-container">
+          <canvas id="classification-canvas" width="800" height="520"></canvas>
+          <div id="tooltip" class="canvas-tooltip"></div>
+        </div>
+
+        <!-- Quick Metrics Bar -->
+        <div class="canvas-footer-stats">
+          <div class="metric-chip">
+            <span class="metric-label">Accuracy</span>
+            <span id="metric-acc" class="metric-value highlight">--%</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-label">Precision</span>
+            <span id="metric-prec" class="metric-value">--</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-label">Recall</span>
+            <span id="metric-rec" class="metric-value">--</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-label">F1-Score</span>
+            <span id="metric-f1" class="metric-value">--</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-label">Boundary Mode</span>
+            <span id="metric-mode" class="status-badge linear">Linear</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Confusion Matrix & Educational Card -->
+      <aside class="analytics-panel card">
+        <div class="panel-section">
+          <h3>Confusion Matrix</h3>
+          <p class="section-desc">Live classification breakdown against current decision surface.</p>
+          
+          <div class="matrix-grid">
+            <div class="matrix-cell header-cell"></div>
+            <div class="matrix-cell header-cell">Pred 0</div>
+            <div class="matrix-cell header-cell">Pred 1</div>
+
+            <div class="matrix-cell header-cell">True 0</div>
+            <div class="matrix-cell cell-tn" id="cell-tn">
+              <span class="cell-label">TN</span>
+              <span class="cell-count" id="val-tn">0</span>
+            </div>
+            <div class="matrix-cell cell-fp" id="cell-fp">
+              <span class="cell-label">FP (Type I)</span>
+              <span class="cell-count" id="val-fp">0</span>
+            </div>
+
+            <div class="matrix-cell header-cell">True 1</div>
+            <div class="matrix-cell cell-fn" id="cell-fn">
+              <span class="cell-label">FN (Type II)</span>
+              <span class="cell-count" id="val-fn">0</span>
+            </div>
+            <div class="matrix-cell cell-tp" id="cell-tp">
+              <span class="cell-label">TP</span>
+              <span class="cell-count" id="val-tp">0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel-section educational-card">
+          <h4>💡 Algorithm Intuition</h4>
+          <div id="edu-insight" class="edu-text">
+            Logistic Regression learns a straight hyperplane separating the two classes by minimizing Binary Cross-Entropy loss.
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

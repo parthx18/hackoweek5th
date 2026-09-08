@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Model Evaluation Lab — Week 9</title>
+  <meta name="description" content="Simple interactive visualizer for model evaluation, classification thresholds, confusion matrices, and precision-recall tradeoff.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="page-header">
+      <span class="badge">Week 9</span>
+      <h1>Model Evaluation Playground</h1>
+      <p class="subtitle">Understand Train/Test Splits, Confusion Matrices, and the Precision-Recall Tradeoff</p>
+    </header>
+
+    <main class="main-grid">
+      <!-- Left: Interactive Threshold Control & Sample Data -->
+      <section class="card control-card">
+        <h3>1. Classification Threshold (τ)</h3>
+        <p class="card-desc">Slide to see how shifting the classification decision cutoff trades off Precision against Recall.</p>
+
+        <div class="slider-wrapper">
+          <div class="slider-header">
+            <span>Threshold</span>
+            <span id="threshold-val" class="mono-badge">0.50</span>
+          </div>
+          <input type="range" id="threshold-slider" min="0.05" max="0.95" step="0.05" value="0.50">
+          <div class="slider-hints">
+            <span>0.05 (High Recall / Catch All)</span>
+            <span>0.50</span>
+            <span>0.95 (High Precision / Strict)</span>
+          </div>
+        </div>
+
+        <div class="test-set-summary">
+          <h4>Test Set Sample Population</h4>
+          <p>Total Samples: <strong>100</strong> (75 Negatives, 25 Positives)</p>
+          <div class="progress-bar">
+            <div class="bar-neg" style="width: 75%;" title="75 Negative Samples">75 Neg</div>
+            <div class="bar-pos" style="width: 25%;" title="25 Positive Samples">25 Pos</div>
+          </div>
+        </div>
+
+        <div class="concept-callout">
+          <h4>💡 Threshold Rule:</h4>
+          <p id="rule-text">If $P(\text{Positive}) \ge 0.50$, predict <strong>Class 1</strong>. Otherwise predict <strong>Class 0</strong>.</p>
+        </div>
+      </section>
+
+      <!-- Center: Confusion Matrix -->
+      <section class="card matrix-card">
+        <h3>2. Live Confusion Matrix</h3>
+        <p class="card-desc">Updates instantaneously based on the threshold above.</p>
+
+        <div class="confusion-grid">
+          <div class="grid-header"></div>
+          <div class="grid-header">Pred Negative (0)</div>
+          <div class="grid-header">Pred Positive (1)</div>
+
+          <div class="grid-header">True Neg (0)</div>
+          <div class="matrix-cell tn-cell">
+            <span class="label">True Negative (TN)</span>
+            <span class="value" id="val-tn">--</span>
+          </div>
+          <div class="matrix-cell fp-cell">
+            <span class="label">False Positive (FP)</span>
+            <span class="value" id="val-fp">--</span>
+            <span class="sub-label">Type I Error</span>
+          </div>
+
+          <div class="grid-header">True Pos (1)</div>
+          <div class="matrix-cell fn-cell">
+            <span class="label">False Negative (FN)</span>
+            <span class="value" id="val-fn">--</span>
+            <span class="sub-label">Type II Error</span>
+          </div>
+          <div class="matrix-cell tp-cell">
+            <span class="label">True Positive (TP)</span>
+            <span class="value" id="val-tp">--</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Live Metrics -->
+      <section class="card metrics-card">
+        <h3>3. Real-Time Metrics</h3>
+        <p class="card-desc">Calculated directly from the live matrix.</p>
+
+        <div class="metric-row">
+          <div class="metric-meta">
+            <span class="metric-name">Accuracy</span>
+            <span class="metric-calc">(TP + TN) / Total</span>
+          </div>
+          <span class="metric-score" id="val-acc">--%</span>
+        </div>
+
+        <div class="metric-row">
+          <div class="metric-meta">
+            <span class="metric-name">Precision</span>
+            <span class="metric-calc">TP / (TP + FP)</span>
+          </div>
+          <span class="metric-score" id="val-prec">--</span>
+        </div>
+
+        <div class="metric-row">
+          <div class="metric-meta">
+            <span class="metric-name">Recall</span>
+            <span class="metric-calc">TP / (TP + FN)</span>
+          </div>
+          <span class="metric-score" id="val-rec">--</span>
+        </div>
+
+        <div class="metric-row highlight">
+          <div class="metric-meta">
+            <span class="metric-name">F1-Score</span>
+            <span class="metric-calc">Harmonic Mean</span>
+          </div>
+          <span class="metric-score" id="val-f1">--</span>
+        </div>
+
+        <div class="scenario-box" id="scenario-hint">
+          <strong>Scenario:</strong> Default balance between precision and recall.
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

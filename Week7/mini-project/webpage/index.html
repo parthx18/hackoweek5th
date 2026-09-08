@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Regression Studio — Week 7 Interactive Lab</title>
+  <meta name="description" content="Interactive visualizer for Linear Regression, Polynomial Regression, and Ridge/Lasso Regularization">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="studio-header">
+      <div class="brand">
+        <span class="badge">Week 7</span>
+        <h1>Regression Studio</h1>
+        <span class="subtitle">Linear • Polynomial • Ridge (L2) • Lasso (L1)</span>
+      </div>
+      <div class="header-actions">
+        <button id="btn-reset" class="btn btn-secondary">↺ Reset Points</button>
+        <button id="btn-sample-data" class="btn btn-primary">🎲 Generate Preset</button>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="studio-workspace">
+      <!-- Left Sidebar: Controls -->
+      <aside class="controls-panel card">
+        <div class="panel-section">
+          <h3>Model Architecture</h3>
+          <div class="model-selector">
+            <button class="model-tab active" data-model="linear">Linear</button>
+            <button class="model-tab" data-model="polynomial">Polynomial</button>
+            <button class="model-tab" data-model="ridge">Ridge (L2)</button>
+            <button class="model-tab" data-model="lasso">Lasso (L1)</button>
+          </div>
+        </div>
+
+        <!-- Hyperparameters -->
+        <div class="panel-section">
+          <h3>Hyperparameters</h3>
+
+          <!-- Degree Slider (Poly / Ridge / Lasso) -->
+          <div class="control-group" id="degree-group">
+            <div class="control-header">
+              <label for="degree-slider">Polynomial Degree</label>
+              <span id="degree-val" class="param-badge">3</span>
+            </div>
+            <input type="range" id="degree-slider" min="1" max="10" step="1" value="3">
+            <div class="slider-marks">
+              <span>1 (Linear)</span>
+              <span>3</span>
+              <span>6</span>
+              <span>10 (Overfit)</span>
+            </div>
+          </div>
+
+          <!-- Regularization Alpha (Ridge / Lasso) -->
+          <div class="control-group" id="alpha-group">
+            <div class="control-header">
+              <label for="alpha-slider">Regularization Strength (λ / α)</label>
+              <span id="alpha-val" class="param-badge">0.100</span>
+            </div>
+            <input type="range" id="alpha-slider" min="-3" max="2" step="0.1" value="-1">
+            <div class="slider-marks">
+              <span>0.001 (None)</span>
+              <span>0.1</span>
+              <span>1.0</span>
+              <span>100 (Heavy)</span>
+            </div>
+          </div>
+
+          <!-- Presets -->
+          <div class="control-group">
+            <label for="preset-select">Dataset Distribution</label>
+            <select id="preset-select" class="dropdown">
+              <option value="cubic">Non-Linear Cubic Trend</option>
+              <option value="linear">Linear with Noise</option>
+              <option value="sine">Sinusoidal Wave</option>
+              <option value="outliers">Cluster with Outliers</option>
+              <option value="empty">Empty Canvas (Click to draw)</option>
+            </select>
+          </div>
+
+          <!-- Options -->
+          <div class="control-group toggles">
+            <label class="switch-container">
+              <input type="checkbox" id="show-residuals" checked>
+              <span class="switch-slider"></span>
+              <span class="switch-label">Show Residual Errors ($y - \hat{y}$)</span>
+            </label>
+            <label class="switch-container">
+              <input type="checkbox" id="show-ci">
+              <span class="switch-slider"></span>
+              <span class="switch-label">Confidence Band</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Formula Callout -->
+        <div class="panel-section formula-card">
+          <div class="formula-title">Current Objective Function</div>
+          <div id="math-formula" class="formula-body">
+            $$J(w) = \frac{1}{m}\sum(y_i - \hat{y}_i)^2$$
+          </div>
+        </div>
+      </aside>
+
+      <!-- Center: Canvas Area -->
+      <section class="canvas-section card">
+        <div class="canvas-toolbar">
+          <div class="canvas-status">
+            <span class="status-dot"></span>
+            <span id="point-count">30 Points</span>
+            <span class="hint-text">• Click anywhere on the plot to add custom points!</span>
+          </div>
+          <div class="canvas-actions">
+            <button id="btn-clear" class="btn-icon" title="Clear all points">🗑️ Clear</button>
+          </div>
+        </div>
+
+        <div class="canvas-container">
+          <canvas id="regression-canvas" width="800" height="520"></canvas>
+          <div id="tooltip" class="canvas-tooltip"></div>
+        </div>
+
+        <!-- Quick Insights Bar below canvas -->
+        <div class="canvas-footer-stats">
+          <div class="metric-chip">
+            <span class="metric-label">R² Score</span>
+            <span id="metric-r2" class="metric-value highlight">--</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-label">MSE</span>
+            <span id="metric-mse" class="metric-value">--</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-label">RMSE</span>
+            <span id="metric-rmse" class="metric-value">--</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-label">MAE</span>
+            <span id="metric-mae" class="metric-value">--</span>
+          </div>
+          <div class="metric-chip">
+            <span class="metric-label">Fit Status</span>
+            <span id="metric-status" class="status-badge optimal">Optimal</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Coefficients & Insights -->
+      <aside class="analytics-panel card">
+        <div class="panel-section">
+          <h3>Weights & Regularization</h3>
+          <p class="section-desc">Watch how Lasso forces coefficients to 0 (sparsity) vs Ridge shrinking them softly.</p>
+          <div id="weights-container" class="weights-bars">
+            <!-- Dynamically generated weight bars -->
+          </div>
+        </div>
+
+        <div class="panel-section educational-card">
+          <h4>💡 What am I seeing?</h4>
+          <div id="edu-insight" class="edu-text">
+            Linear Regression fits the line that minimizes the sum of squared vertical distances.
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
