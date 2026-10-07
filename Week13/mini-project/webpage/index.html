@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ensemble Battleground — Week 13</title>
+  <meta name="description" content="Interactive simulator comparing Bagging (Random Forest) vs Boosting (XGBoost, LightGBM) with dynamic decision boundary visualization.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="page-header">
+      <div class="header-badges">
+        <span class="badge">Week 13</span>
+        <span class="badge-amber">Ensemble Learning</span>
+      </div>
+      <h1>Ensemble Methods: Bagging & Boosting Lab</h1>
+      <p class="subtitle">Experience how Bootstrap Aggregating (Bagging) reduces variance and Sequential Boosters (XGBoost, LightGBM) eliminate bias.</p>
+    </header>
+
+    <main class="main-grid">
+      <!-- Left: Configuration -->
+      <section class="card control-card">
+        <h3>1. Ensemble Architecture</h3>
+        <p class="card-desc">Select model paradigm and tune hyperparameters to inspect decision boundary adaptation.</p>
+
+        <div class="control-group">
+          <label for="model-select">Ensemble Algorithm:</label>
+          <select id="model-select">
+            <option value="tree">Single Decision Tree (Unpruned / High Variance)</option>
+            <option value="rf" selected>Random Forest (Bagging + Feature Subspace)</option>
+            <option value="xgb">XGBoost (2nd Order Taylor + L1/L2 Regularization)</option>
+            <option value="lgb">LightGBM (Leaf-wise Best-First + Histogram Bins)</option>
+          </select>
+        </div>
+
+        <div class="slider-wrapper">
+          <div class="slider-header">
+            <span>Ensemble Size (Number of Trees / Estimators)</span>
+            <span id="trees-val" class="mono-badge">50 trees</span>
+          </div>
+          <input type="range" id="trees-slider" min="1" max="150" step="5" value="50">
+          <div class="slider-hints">
+            <span>1 (Single Tree)</span>
+            <span>50</span>
+            <span>150 (Deep Ensemble)</span>
+          </div>
+        </div>
+
+        <div class="slider-wrapper" id="lr-wrapper">
+          <div class="slider-header">
+            <span>Learning Rate / Shrinkage (η)</span>
+            <span id="lr-val" class="mono-badge">0.10</span>
+          </div>
+          <input type="range" id="lr-slider" min="0.01" max="1.0" step="0.02" value="0.10">
+          <div class="slider-hints">
+            <span>0.01 (Conservative)</span>
+            <span>0.10</span>
+            <span>1.0 (Aggressive)</span>
+          </div>
+        </div>
+
+        <div class="slider-wrapper">
+          <div class="slider-header">
+            <span>Tree Max Depth / Leaves</span>
+            <span id="depth-val" class="mono-badge">Depth: 4</span>
+          </div>
+          <input type="range" id="depth-slider" min="1" max="10" step="1" value="4">
+          <div class="slider-hints">
+            <span>1 (Decision Stump)</span>
+            <span>4</span>
+            <span>10 (Overfit Risk)</span>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button id="btn-re-train" class="btn primary">Regenerate Non-linear Data</button>
+        </div>
+
+        <div class="concept-callout">
+          <h4 id="paradigm-header">💡 Bagging vs Boosting:</h4>
+          <p id="paradigm-desc"><strong>Random Forest (Bagging):</strong> Trees are grown independently in parallel. Averaging individual high-variance trees smooths jagged boundaries and prevents overfitting.</p>
+        </div>
+      </section>
+
+      <!-- Center: Decision Boundary Canvas -->
+      <section class="card canvas-card">
+        <div class="canvas-header">
+          <div>
+            <h3 id="canvas-title">2. Live Decision Surface & Probability Field</h3>
+            <p class="card-desc">Contour heatmap showing predicted class confidence.</p>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-dot" style="background:#3b82f6"></span><span>Class 0</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ef4444"></span><span>Class 1</span></div>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="ensemble-canvas" width="600" height="420"></canvas>
+        </div>
+
+        <!-- Comparative Metrics Bar -->
+        <div class="benchmark-pills">
+          <div class="pill">
+            <span class="p-label">Test Accuracy</span>
+            <span class="p-val" id="val-acc">89.7%</span>
+          </div>
+          <div class="pill">
+            <span class="p-label">ROC-AUC Score</span>
+            <span class="p-val" id="val-auc">97.0%</span>
+          </div>
+          <div class="pill">
+            <span class="p-label">Variance Damping</span>
+            <span class="p-val" id="val-var">High</span>
+          </div>
+          <div class="pill">
+            <span class="p-label">Training Speed</span>
+            <span class="p-val" id="val-speed">Ultra Fast</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Comparative Diagnostic & Architectural Deep-Dive -->
+      <section class="card metrics-card">
+        <h3>3. Architecture Breakdown</h3>
+        <p class="card-desc">How this specific algorithm computes splits and updates.</p>
+
+        <div class="arch-card" id="arch-details">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="comparison-table-wrapper">
+          <h4>SOTA Booster Shootout</h4>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>XGBoost</th>
+                <th>LightGBM</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Tree Growth</strong></td>
+                <td>Level-wise (Depth)</td>
+                <td><strong>Leaf-wise (Loss)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Binning</strong></td>
+                <td>Exact / Quantile</td>
+                <td><strong>Histograms (256 bins)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Sampling</strong></td>
+                <td>Uniform / Subsample</td>
+                <td><strong>GOSS (Gradient-based)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Regularization</strong></td>
+                <td>Built-in L1/L2</td>
+                <td>Built-in L1/L2</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="rule-box">
+          <h4>🏆 Golden Rule of Ensembles:</h4>
+          <p>For tabular data, <strong>LightGBM</strong> and <strong>XGBoost</strong> reign supreme. Random Forest serves as the robust, hyperparameter-resistant benchmark.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
