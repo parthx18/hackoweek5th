@@ -15,7 +15,6 @@ Week3/
     ├── requirements.txt
     └── grade_calculator.py    ← OOP + NumPy grade analyzer
 ```
-
 ## 🚀 Mini-Project: Student Grade Calculator
 A Python OOP app that uses:
 - Classes & objects (OOP)
