@@ -28,7 +28,6 @@
     Produces exact sparse weights ($w_j = 0$); performs automatic feature selection.
   - **ElasticNet**: Combines both L1 and L2 penalties:
     $$\mathcal{L}_{\text{Elastic}} = \text{MSE} + r \lambda \|w\|_1 + \frac{1-r}{2} \lambda \|w\|_2^2$$
-
 ## 🗂️ Structure
 ```
 Week14/
