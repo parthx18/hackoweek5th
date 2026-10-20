@@ -5,7 +5,6 @@
 - Matrices: operations, multiplication, transpose, inverse
 - Dot product: geometric intuition + NumPy
 - Eigenvalues & Eigenvectors: intuition-level understanding
-
 ## 🗂️ Structure
 ```
 Week5/
