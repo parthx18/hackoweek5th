@@ -2,7 +2,6 @@
 
 ## 🎯 Topic / Skill
 APIs & Backend Basics using **Node.js / Express**
-
 ## 📋 Learning Objectives
 - Understand what an API is and how REST works
 - Set up a Node.js + Express server from scratch
