@@ -21,7 +21,6 @@
   - Deterministic linear projection vs. Stochastic iterative optimization
   - Computational complexity ($O(N \log N)$ vs $O(N \cdot D^2)$)
   - Downstream modeling considerations (t-SNE is purely a visualization tool; PCA can transform unseen test data)
-
 ## 🗂️ Structure
 ```
 Week12/
