@@ -8,7 +8,6 @@
 - **Regularization**:
   - **Ridge ($L_2$) Regression**: Weight penalty $\lambda \sum w_i^2$, shrinkage without zeroing
   - **Lasso ($L_1$) Regression**: Weight penalty $\lambda \sum |w_i|$, sparsity & automatic feature selection
-
 ## 🗂️ Structure
 ```
 Week7/
