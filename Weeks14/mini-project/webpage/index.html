@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bias-Variance & Regularization Lab — Week 14</title>
+  <meta name="description" content="Interactive simulator exploring the Bias-Variance tradeoff, Overfitting vs Underfitting, and L1 Lasso / L2 Ridge Regularization.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="page-header">
+      <div class="header-badges">
+        <span class="badge">Week 14</span>
+        <span class="badge-emerald">Model Generalization</span>
+      </div>
+      <h1>Bias–Variance Tradeoff & Regularization Playground</h1>
+      <p class="subtitle">Witness how model capacity triggers underfitting or wild overfitting, and observe how L1 (Lasso) and L2 (Ridge) penalties tame excessive parameters.</p>
+    </header>
+
+    <main class="main-grid">
+      <!-- Left: Controls -->
+      <section class="card control-card">
+        <h3>1. Model Complexity & Penalties</h3>
+        <p class="card-desc">Slide polynomial degree and penalty parameter (λ) to observe curve fitting in real time.</p>
+
+        <div class="slider-wrapper">
+          <div class="slider-header">
+            <span>Polynomial Degree (Model Complexity)</span>
+            <span id="degree-val" class="mono-badge">Degree: 14</span>
+          </div>
+          <input type="range" id="degree-slider" min="1" max="15" step="1" value="14">
+          <div class="slider-hints">
+            <span>1 (Underfitting / High Bias)</span>
+            <span>4 (Sweet Spot)</span>
+            <span>15 (Wild Overfitting)</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label for="reg-select">Regularization Penalty Type:</label>
+          <select id="reg-select">
+            <option value="none">None (Standard OLS - Unconstrained)</option>
+            <option value="l2" selected>L2 Ridge Regularization (Smooth Shrinkage)</option>
+            <option value="l1">L1 Lasso Regularization (Sparsity / Zero Weights)</option>
+          </select>
+        </div>
+
+        <div class="slider-wrapper" id="lambda-wrapper">
+          <div class="slider-header">
+            <span>Regularization Strength (λ)</span>
+            <span id="lambda-val" class="mono-badge">λ = 0.050</span>
+          </div>
+          <input type="range" id="lambda-slider" min="0" max="1.0" step="0.005" value="0.05">
+          <div class="slider-hints">
+            <span>0.00 (Unconstrained)</span>
+            <span>0.05</span>
+            <span>1.00 (Heavy Shrinkage)</span>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button id="btn-re-sample" class="btn primary">Resample Training Points (Noise)</button>
+        </div>
+
+        <div class="concept-callout">
+          <h4>💡 Expected Prediction Error:</h4>
+          <p>$\text{Error} = \text{Bias}^2 + \text{Variance} + \sigma^2$<br>
+          Underfitting means high bias (inflexible model). Overfitting means high variance (sensitivity to sample fluctuations).
+          </p>
+        </div>
+      </section>
+
+      <!-- Center: Interactive Plot Canvas -->
+      <section class="card canvas-card">
+        <div class="canvas-header">
+          <div>
+            <h3 id="regime-title">2. Curve Fitting & Generalization</h3>
+            <p class="card-desc" id="regime-subtitle">Visualizing true signal vs model polynomial hypothesis.</p>
+          </div>
+          <div class="legend">
+            <div class="legend-item"><span class="legend-line" style="background:#10b981"></span><span>Ground Truth f(x)</span></div>
+            <div class="legend-item"><span class="legend-line" style="background:#6366f1"></span><span>Fitted Model</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#38bdf8"></span><span>Train Data</span></div>
+          </div>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="bv-canvas" width="600" height="420"></canvas>
+        </div>
+
+        <!-- Real-time Diagnostic Dashboard -->
+        <div class="metrics-row">
+          <div class="m-card">
+            <span class="m-label">Train MSE</span>
+            <span class="m-val" id="train-mse">0.033</span>
+          </div>
+          <div class="m-card">
+            <span class="m-label">Test MSE</span>
+            <span class="m-val" id="test-mse">0.036</span>
+          </div>
+          <div class="m-card">
+            <span class="m-label">Generalization Gap</span>
+            <span class="m-val" id="gen-gap">0.003 (Low)</span>
+          </div>
+          <div class="m-card">
+            <span class="m-label">Active Features</span>
+            <span class="m-val" id="active-features">14 / 14</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Coefficients & Regularization Breakdown -->
+      <section class="card metrics-card">
+        <h3>3. Weight Magnitude & Sparsity</h3>
+        <p class="card-desc">Observing how penalties shrink weights toward zero.</p>
+
+        <div class="weights-wrapper">
+          <h4>Polynomial Coefficients ($w_1 \dots w_d$)</h4>
+          <div class="weight-bars" id="weight-bars"></div>
+        </div>
+
+        <div class="comparison-table-wrapper">
+          <h4>L1 Lasso vs. L2 Ridge</h4>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Ridge (L2)</th>
+                <th>Lasso (L1)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Penalty Term</strong></td>
+                <td>$\lambda \sum w_j^2$</td>
+                <td>$\lambda \sum |w_j|$</td>
+              </tr>
+              <tr>
+                <td><strong>Geometry</strong></td>
+                <td>Smooth Sphere</td>
+                <td>Sharp Diamond</td>
+              </tr>
+              <tr>
+                <td><strong>Weight Result</strong></td>
+                <td>Small, non-zero</td>
+                <td><strong>Exact 0 (Sparsity)</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Collinearity</strong></td>
+                <td>Stable groups</td>
+                <td>Selects one</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="rule-box">
+          <h4>🎯 Practical Takeaway:</h4>
+          <p>When you have thousands of features and suspect only a few are truly predictive, use <strong>Lasso (L1)</strong>. When all features carry moderate signal, use <strong>Ridge (L2)</strong>.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

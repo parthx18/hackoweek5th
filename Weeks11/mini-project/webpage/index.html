@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCA Explorer — Dimensionality Reduction Lab | Week 11</title>
+  <meta name="description" content="Interactive 2D/3D Principal Component Analysis (PCA) playground with variance projection, scree plot, and eigenvector inspection.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="page-header">
+      <div class="header-badges">
+        <span class="badge">Week 11</span>
+        <span class="badge-accent">Unsupervised Learning</span>
+      </div>
+      <h1>Principal Component Analysis (PCA) Lab</h1>
+      <p class="subtitle">Experience how PCA rotates coordinate axes, discovers maximal variance vectors, and projects high dimensions into 2D.</p>
+    </header>
+
+    <main class="main-grid">
+      <!-- Control Panel -->
+      <section class="card control-card">
+        <h3>1. Projection Controls</h3>
+        <p class="card-desc">Adjust projection angle & variance threshold to observe orthogonal compression in real time.</p>
+
+        <div class="control-group">
+          <label for="dataset-select">Select High-D Dataset:</label>
+          <select id="dataset-select">
+            <option value="iris">Iris Flowers (4 Dimensions)</option>
+            <option value="clusters">Correlated Gaussian Clusters (4 Dimensions)</option>
+            <option value="spiral">Elliptical Expansion (3 Dimensions)</option>
+          </select>
+        </div>
+
+        <div class="slider-wrapper">
+          <div class="slider-header">
+            <span>Projection Axis Angle (PC1 Rotation)</span>
+            <span id="angle-val" class="mono-badge">0° (Optimal PC1)</span>
+          </div>
+          <input type="range" id="angle-slider" min="-90" max="90" step="1" value="0">
+          <div class="slider-hints">
+            <span>-90°</span>
+            <span>0° (Optimal PC1)</span>
+            <span>+90°</span>
+          </div>
+        </div>
+
+        <div class="variance-gauge-box">
+          <div class="gauge-title">
+            <span>Variance Captured along Axis</span>
+            <span id="variance-val" class="variance-score">72.96%</span>
+          </div>
+          <div class="progress-bar">
+            <div id="variance-bar" class="progress-fill" style="width: 73%;"></div>
+          </div>
+          <p class="gauge-sub">PCA mathematically guarantees that PC1 captures the maximum possible variance.</p>
+        </div>
+
+        <div class="btn-group">
+          <button id="btn-reset-pca" class="btn primary">Snap to Optimal PC1 & PC2</button>
+          <button id="btn-toggle-vectors" class="btn secondary">Toggle Eigenvectors</button>
+        </div>
+
+        <div class="concept-callout">
+          <h4>💡 Core PCA Theorem:</h4>
+          <p>The eigenvectors of covariance matrix $\Sigma = \frac{1}{n} X^T X$ define the principal axes, and their eigenvalues $\lambda_i$ represent the variance captured along each axis.</p>
+        </div>
+      </section>
+
+      <!-- Center: 2D Interactive Canvas -->
+      <section class="card canvas-card">
+        <div class="canvas-header">
+          <div>
+            <h3>2. Dynamic Data Projection</h3>
+            <p class="card-desc">Scatter points projected along chosen principal components.</p>
+          </div>
+          <div class="legend" id="plot-legend"></div>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="pca-canvas" width="600" height="420"></canvas>
+        </div>
+
+        <div class="scree-container">
+          <h4>Scree Plot: Explained Variance Ratio (EVR)</h4>
+          <div class="scree-bars" id="scree-bars"></div>
+        </div>
+      </section>
+
+      <!-- Right: Mathematical Metrics & Loadings -->
+      <section class="card metrics-card">
+        <h3>3. Eigendecomposition & Loadings</h3>
+        <p class="card-desc">Principal Component influence and variance decomposition.</p>
+
+        <div class="eigen-summary" id="eigen-summary">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div class="loadings-table-wrapper">
+          <h4>Feature Loadings Matrix ($W$)</h4>
+          <table class="data-table" id="loadings-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>PC 1</th>
+                <th>PC 2</th>
+              </tr>
+            </thead>
+            <tbody id="loadings-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="action-summary">
+          <h4>Key Insight:</h4>
+          <p id="insight-text">PC1 and PC2 retain <strong>95.8%</strong> of the total information across all original 4 dimensions with zero covariance between PC1 and PC2.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

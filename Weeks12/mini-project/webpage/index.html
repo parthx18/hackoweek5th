@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>t-SNE Intuition Lab — Week 12</title>
+  <meta name="description" content="Interactive visualizer for t-SNE intuition, perplexity parameter tuning, Student's t-distribution vs Gaussian, and high-dimensional manifold embedding.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="page-header">
+      <div class="header-badges">
+        <span class="badge">Week 12</span>
+        <span class="badge-pink">Non-Linear Manifolds</span>
+      </div>
+      <h1>t-SNE Intuition & Perplexity Playground</h1>
+      <p class="subtitle">Discover how t-Distributed Stochastic Neighbor Embedding uses probabilities and heavy tails to solve the crowding problem.</p>
+    </header>
+
+    <main class="main-grid">
+      <!-- Controls -->
+      <section class="card control-card">
+        <h3>1. Manifold & Hyperparameters</h3>
+        <p class="card-desc">Tune perplexity and iterations to inspect real-time cluster separation vs fragmentation.</p>
+
+        <div class="control-group">
+          <label for="dataset-select">Select Manifold Dataset:</label>
+          <select id="dataset-select">
+            <option value="digits">Handwritten Digits (64-D Image Embeddings)</option>
+            <option value="concentric">Concentric Rings (Non-linear Manifold)</option>
+            <option value="singlecell">Single-Cell RNA Clusters (Bio Clusters)</option>
+          </select>
+        </div>
+
+        <div class="slider-wrapper">
+          <div class="slider-header">
+            <span>Perplexity (Effective Neighborhood)</span>
+            <span id="perp-val" class="mono-badge">30</span>
+          </div>
+          <input type="range" id="perp-slider" min="2" max="60" step="1" value="30">
+          <div class="slider-hints">
+            <span>2 (Tiny islands)</span>
+            <span>30 (Balanced)</span>
+            <span>60 (Global blend)</span>
+          </div>
+        </div>
+
+        <div class="slider-wrapper">
+          <div class="slider-header">
+            <span>Optimization Iterations</span>
+            <span id="iter-val" class="mono-badge">1000 steps</span>
+          </div>
+          <input type="range" id="iter-slider" min="100" max="2000" step="100" value="1000">
+          <div class="slider-hints">
+            <span>100 (Unfolded)</span>
+            <span>1000</span>
+            <span>2000 (Equilibrium)</span>
+          </div>
+        </div>
+
+        <div class="btn-group">
+          <button id="btn-toggle-algorithm" class="btn primary">Switch to Linear PCA View</button>
+          <button id="btn-re-seed" class="btn secondary">Re-seed Random Map (Stochasticity)</button>
+        </div>
+
+        <div class="concept-callout">
+          <h4>💡 The Heavy-Tail Secret:</h4>
+          <p>Gaussian in high-D: $p_{j|i} \propto e^{-\|x_i-x_j\|^2 / 2\sigma^2}$<br>
+             Student-t in 2D: $q_{ij} \propto (1 + \|y_i-y_j\|^2)^{-1}$<br>
+             The inverse-square heavy tail pushes moderately dissimilar points far apart, solving the <strong>Crowding Problem</strong>.
+          </p>
+        </div>
+      </section>
+
+      <!-- Center: 2D Interactive Scatter Canvas -->
+      <section class="card canvas-card">
+        <div class="canvas-header">
+          <div>
+            <h3 id="view-mode-title">2. Non-Linear Embedding Space (t-SNE)</h3>
+            <p class="card-desc" id="view-mode-subtitle">Local neighborhood clustering with perplexity 30.</p>
+          </div>
+          <div class="legend" id="plot-legend"></div>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="tsne-canvas" width="600" height="420"></canvas>
+        </div>
+
+        <!-- Student-t vs Gaussian curve interactive visual -->
+        <div class="distribution-comparison">
+          <div class="dist-header">
+            <h4>Probability Distribution Comparison (Why Student's t-Distribution?)</h4>
+            <span class="dist-badge">Heavy-Tail Effect</span>
+          </div>
+          <div class="dist-curves-box">
+            <canvas id="curve-canvas" width="560" height="120"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right: Comparative Diagnostic & Guide -->
+      <section class="card metrics-card">
+        <h3>3. Dimensionality Diagnostic</h3>
+        <p class="card-desc">Comparing PCA global variance vs t-SNE cluster fidelity.</p>
+
+        <div class="diag-summary" id="diag-summary">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="comparison-table-wrapper">
+          <h4>PCA vs. t-SNE Cheat Sheet</h4>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Property</th>
+                <th>PCA</th>
+                <th>t-SNE</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Method</strong></td>
+                <td>Linear</td>
+                <td>Non-linear</td>
+              </tr>
+              <tr>
+                <td><strong>Target</strong></td>
+                <td>Global variance</td>
+                <td>Local neighbors</td>
+              </tr>
+              <tr>
+                <td><strong>New Data</strong></td>
+                <td>Supports <code>transform()</code></td>
+                <td>Must re-compute</td>
+              </tr>
+              <tr>
+                <td><strong>Distances</strong></td>
+                <td>Globally meaningful</td>
+                <td>Inter-cluster relative</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="warning-box">
+          <h4>⚠️ Interpretation Caution:</h4>
+          <p>Never interpret cluster distances in t-SNE as physical metric distances. Cluster size in t-SNE expands or shrinks depending on density; use it strictly for finding topology and discrete groupings.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
