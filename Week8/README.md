@@ -16,7 +16,6 @@
   - Confusion Matrix (TP, FP, TN, FN)
   - Accuracy, Precision, Recall, and $F_1$-Score
   - ROC (Receiver Operating Characteristic) curve and AUC intuition
-
 ## 🗂️ Structure
 ```
 Week8/
