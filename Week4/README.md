@@ -3,7 +3,6 @@
 ## 🎯 Topics
 - Pandas: DataFrames, cleaning, merging, groupby
 - Data Visualization: Matplotlib, Seaborn
-
 ## 🗂️ Structure
 ```
 Week4/
