@@ -13,7 +13,6 @@
   - One-Hot Encoding for nominal categories
   - Label / Ordinal Encoding for ranked categories
 - **Preventing Data Leakage**: Fitting transformers strictly on the training set
-
 ## 🗂️ Structure
 ```
 Week10/
