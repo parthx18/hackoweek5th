@@ -23,7 +23,6 @@
     - Leaf-wise (best-first) tree growth with `max_depth` control vs. level-wise depth-first growth
 - **Comparative Benchmarking**:
   - Training speed, memory footprint, scale handling, and hyperparameter tuning
-
 ## 🗂️ Structure
 ```
 Week13/
