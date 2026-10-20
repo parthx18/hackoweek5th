@@ -11,7 +11,6 @@
   2. Load model → `pickle.load()` / `joblib.load()`
   3. Run inference on new data
 - **Best Practices**: versioning model files, storing preprocessing pipelines together with the model
-
 ### Part 2: Perceptrons & Activation Functions
 - **Perceptron**: Simplest neural unit — weighted sum of inputs + bias passed through an activation
 - **Common Activation Functions**:
