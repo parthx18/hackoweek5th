@@ -20,7 +20,6 @@
   - High-dimensional data visualization (2D/3D projection)
   - Noise reduction and feature compression for downstream ML models
   - Limitations: Linear assumption, scale sensitivity, loss of direct feature interpretability
-
 ## 🗂️ Structure
 ```
 Week11/
