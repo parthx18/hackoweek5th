@@ -7,7 +7,6 @@ Applying APIs & Backend Basics — **Building a Complete REST API**
 
 Build a fully functional REST API for managing student notes.  
 This is a real-world backend project using Node.js + Express.
-
 ## 🗂️ Folder Structure
 ```
 Week2/
