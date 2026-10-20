@@ -22,7 +22,6 @@ Week9/
         ├── style.css
         └── app.js
 ```
-
 ## 🚀 Mini-Project: Model Evaluator
 A straightforward Python script that:
 - Splits a dataset into training and test sets
