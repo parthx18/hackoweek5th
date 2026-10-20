@@ -1,7 +1,6 @@
 # Week 16 — Loss Functions, Optimizers & Neural Network from Scratch
 
 ## 🎯 Topics
-
 ### Part 1: Loss Functions
 - **Regression Losses**:
   - Mean Squared Error (MSE): average of squared differences
