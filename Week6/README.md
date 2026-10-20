@@ -5,7 +5,6 @@
 - Gradients: multi-variable derivatives, direction of steepest ascent/descent
 - Chain Rule: compounding rates of change (layer to layer)
 - Backpropagation intuition: updating neural network weights
-
 ## 🗂️ Structure
 ```
 Week6/
