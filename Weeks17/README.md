@@ -3,7 +3,6 @@
 Welcome to **Week 17** of the practical deep learning curriculum! This week covers the fundamental building blocks of modern deep learning using **PyTorch**: from raw tensors and automatic differentiation to convolutional vision models and recurrent sequence architectures.
 
 ---
-
 ## 🎯 Topics Covered
 
 ### 1. PyTorch Fundamentals & Training Loop
