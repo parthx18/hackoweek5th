@@ -5,7 +5,6 @@ Welcome to **Week 18** of the deep learning curriculum! This week bridges classi
 ---
 
 ## 🎯 Topics Covered
-
 ### 1. Transfer Learning with Pretrained CNNs
 - **Transfer Learning Paradigm**: Why train from scratch when models trained on millions of images (ImageNet) have already learned rich hierarchical representations?
 - **Feature Extraction**: Freezing the convolutional backbone (`requires_grad = False`) and replacing only the final classification head (`fc`).
